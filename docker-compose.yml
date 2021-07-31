@@ -1,0 +1,48 @@
+version: '3'
+
+services:
+  server:
+    container_name: nodejs
+    build: '.' # especificando o diretório do DockerFile
+    command: yarn start # comando para iniciar o serviço referente ao servidor
+    ports:
+      - '3333:3333' # especificando o mapeamento da porta da máquina local com a do container docker
+    volumes:
+      - ./home/node/app # espelhando todo o conteúdo do backend no docker excepto aqueles arquivos e pastas que constam no .dockerignore
+    depends_on:
+      - mongo # definindo a dependência em que o 'mongo' deve ser inicializado antes do 'node'
+    links:
+      - mongo
+  mongo:
+    image: 'mongo'
+    container_name: mongodb
+    ports:
+      - '27017:27017'
+
+  elasticsearch01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.0
+    container_name: elasticsearch01
+    ports:
+      - 9200:9200
+      - 9300:9300
+    environment:
+      discovery.type: single-node
+    networks:
+      - elastic
+
+  kibana01:
+    image: docker.elastic.co/kibana/kibana:7.9.2
+    container_name: kibana01
+    ports:
+      - 5601:5601
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch01:9200
+      ELASTICSEARCH_HOSTS: http://elasticsearch01:9200
+    depends_on:
+      - elasticsearch01
+    networks:
+      - elastic
+
+networks:
+  elastic:
+    driver: bridge

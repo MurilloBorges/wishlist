@@ -37,6 +37,11 @@ class ClientsRepository extends Schema<IClient> {
     return result;
   }
 
+  public async updateName(id: string, name: string): Promise<IClient | null> {
+    const result = await this.model.findOneAndUpdate({ _id: id }, { name }, { new: true });
+    return result;
+  }
+
   public async delete(id: string): Promise<IClient | null> {
     const result = await this.model.findOneAndDelete({ _id: id });
     return result;

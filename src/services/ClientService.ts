@@ -13,6 +13,12 @@ class ClientService {
 
   public async store(client: IClient): Promise<IClient> {
     try {
+      const existsClient = await this.index({ email: client.email });
+
+      if (existsClient.length >= 1) {
+        throw new AppError(400, [IErrors.client.exists]);
+      }
+
       const result = await this.repository.store(client);
       return result;
     } catch (error) {
@@ -32,6 +38,11 @@ class ClientService {
   public async show(id: string): Promise<IClient | null> {
     try {
       const result = await this.repository.show(id);
+
+      if (!result) {
+        throw new AppError(404, [IErrors.client.notFound]);
+      }
+
       return result;
     } catch (error) {
       throw new AppError(500, [IErrors.client.failedToShow]);
@@ -47,8 +58,30 @@ class ClientService {
     }
   }
 
+  public async updateName(id: string, name: string): Promise<IClient | null> {
+    try {
+      const client = await this.show(id);
+
+      if (!client) {
+        throw new AppError(404, [IErrors.client.notFound]);
+      }
+
+      const result = await this.repository.updateName(id, name);
+
+      return result;
+    } catch (error) {
+      throw new AppError(500, [IErrors.client.failedToUpdate]);
+    }
+  }
+
   public async delete(id: string): Promise<IClient | null> {
     try {
+      const client = await this.show(id);
+
+      if (!client) {
+        throw new AppError(404, [IErrors.client.notFound]);
+      }
+
       const result = await this.repository.delete(id);
       return result;
     } catch (error) {

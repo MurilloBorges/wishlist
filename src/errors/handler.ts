@@ -7,7 +7,7 @@ interface ValidationErrors {
   [key: string]: string[];
 }
 
-const errorHandler: ErrorRequestHandler = (error, request, response, next) => {
+const errorHandler: ErrorRequestHandler = (error, request, response) => {
   if (error instanceof ValidationError) {
     const errors: ValidationErrors = {};
 

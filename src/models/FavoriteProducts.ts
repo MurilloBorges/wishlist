@@ -1,12 +1,11 @@
 import { Schema, model, Document, Model, Types } from 'mongoose';
-import { IClient } from './Clients';
 
 export interface IFavoriteProduct extends Document {
-  id: string;
-  client: IClient;
-  productId: number;
-  createdAt: Date;
-  updatedAt: Date;
+  id?: string;
+  client: string;
+  productId: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 const FavoriteProductSchema = new Schema(
@@ -17,7 +16,7 @@ const FavoriteProductSchema = new Schema(
       required: true,
     },
     productId: {
-      type: Number,
+      type: String,
       required: true,
     },
   },
@@ -26,7 +25,6 @@ const FavoriteProductSchema = new Schema(
   },
 );
 
-export const FavoriteProduct: Model<IFavoriteProduct> = model(
-  'FavoriteProduct',
-  FavoriteProductSchema,
-);
+const FavoriteProducts: Model<IFavoriteProduct> = model('FavoriteProduct', FavoriteProductSchema);
+
+export default FavoriteProducts;

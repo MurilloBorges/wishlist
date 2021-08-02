@@ -15,5 +15,6 @@ Product.get('/favorites', authMiddleware, FavoriteProductController.index);
 Product.get('/favorites/:id', authMiddleware, FavoriteProductController.show);
 Product.get('/:id/favorites', authMiddleware, FavoriteProductController.showByProduct);
 Product.delete('/favorites/:id', authMiddleware, FavoriteProductController.delete);
+Product.delete('/:id/favorites', authMiddleware, FavoriteProductController.deleteByProduct);
 
 export default Product;

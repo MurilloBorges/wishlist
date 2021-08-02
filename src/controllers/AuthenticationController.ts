@@ -8,12 +8,13 @@ import ClientService from 'services/ClientService';
 import authConfig from '../config/auth';
 import { generateToken } from '../middlewares/auth';
 
-const validateError = (res: Response, status?: number, msg?: string): Response => {
-  return res
-    .status(status || 400)
-    .json({ errors: [{ error: msg || 'Objeto de autenticação inválido' }] });
-};
 class AuthenticationController {
+  private readonly clientService: ClientService;
+
+  constructor() {
+    this.clientService = new ClientService();
+  }
+
   public async authenticate(req: Request, res: Response): Promise<Response> {
     const { secret, expiresIn } = authConfig.jwt;
 
@@ -25,11 +26,14 @@ class AuthenticationController {
       abortEarly: false,
     });
 
+    if (!(await schema.isValid(req.body))) {
+      throw new AppError(400, [IErrors.auth.failed]);
+    }
+
     const { email } = req.body;
 
     try {
-      const clientService = new ClientService();
-      const client = await clientService.index({ email });
+      const client = await this.clientService.index({ email });
 
       if (!client || client.length === 0) {
         throw new AppError(404, [IErrors.client.notFound]);
@@ -41,7 +45,7 @@ class AuthenticationController {
 
       return res.status(200).json({ token });
     } catch (error) {
-      return validateError(res);
+      throw new AppError(500, [IErrors.auth.failedGenerateToken]);
     }
   }
 
@@ -49,14 +53,13 @@ class AuthenticationController {
     const { secret, expiresIn } = authConfig.jwt;
 
     if (!req.clientId) {
-      return validateError(res, 401, 'Token inválido');
+      throw new AppError(401, [IErrors.auth.tokenInvalid]);
     }
 
     const { clientId } = req;
 
     try {
-      const clientService = new ClientService();
-      const client = await clientService.show(clientId);
+      const client = await this.clientService.show(clientId);
 
       if (!client) {
         throw new AppError(404, [IErrors.client.notFound]);
@@ -66,7 +69,7 @@ class AuthenticationController {
 
       return res.status(200).json({ token });
     } catch (error) {
-      return validateError(res, 401, 'Token inválido');
+      throw new AppError(500, [IErrors.auth.failedRefreshToken]);
     }
   }
 }

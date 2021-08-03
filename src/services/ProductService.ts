@@ -6,6 +6,13 @@ import IErrors from '../errors/IErrors';
 export default class ProductService extends HttpClientChallenge {
   private static classInstance?: ProductService;
 
+  /**
+   * Método responsável por criar uma nova instância da classe ProductService
+   *
+   * @public
+   * @static
+   * @returns {ProductService} ProductService
+   */
   public static getInstance(): ProductService {
     if (!this.classInstance) {
       this.classInstance = new ProductService();
@@ -14,6 +21,15 @@ export default class ProductService extends HttpClientChallenge {
     return this.classInstance;
   }
 
+  /**
+   * Método responsável por buscar todos os produtos da API,
+   * tendo como premissa a páginação da consulta
+   *
+   * @public
+   * @async
+   * @param {number} page
+   * @returns {Promise<IProductInterface[]>} Promise<IProductInterface[]>
+   */
   public async index(page = 1): Promise<IProductInterface[]> {
     try {
       const res = await this.instance.get(`/product/?page=${page}`);
@@ -27,6 +43,15 @@ export default class ProductService extends HttpClientChallenge {
     }
   }
 
+  /**
+   * Método responsável por buscar um produto na API,
+   * tendo como premissa o id do produto para consulta
+   *
+   * @public
+   * @async
+   * @param {string} id
+   * @returns {Promise<IProductInterface>} Promise<IProductInterface>
+   */
   public async show(id: string): Promise<IProductInterface> {
     try {
       const res = await this.instance.get<IProductInterface>(`/product/${id}/`);

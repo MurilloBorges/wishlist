@@ -6,6 +6,17 @@ import * as jwt from 'jsonwebtoken';
 import authConfig from '../config/auth';
 import logger from '../log/logger';
 
+/**
+ * Função responsável por gerar o token JWT
+ *
+ * @export
+ * @async
+ * @function
+ * @param {string} appSecret
+ * @param {string} expires
+ * @param {Object} params
+ * @returns {Promise<string>} Promise<string>
+ */
 export async function generateToken(
   appSecret: string,
   expires: string,
@@ -32,6 +43,15 @@ export async function generateToken(
   }
 }
 
+/**
+ * Função responsável por decodificar o token JWT
+ *
+ * @export
+ * @function
+ * @param {string} token
+ * @param {boolean} ignoreExpiration
+ * @returns {Object} { clientId: string; exp: number }
+ */
 export function decodeToken(
   token: string,
   ignoreExpiration = false,
@@ -51,6 +71,17 @@ export function decodeToken(
   }
 }
 
+/**
+ * Função responsável por realizar interceptar e realizar a validação do token JWT
+ *
+ * @export
+ * @default
+ * @function
+ * @param {Request} req
+ * @param {Response} res
+ * @param {NextFunction} next
+ * @returns {any} any
+ */
 export default function ensureAuthenticated(req: Request, res: Response, next: NextFunction): any {
   const { authorization } = req.headers;
 

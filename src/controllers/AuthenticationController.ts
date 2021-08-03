@@ -16,6 +16,16 @@ class AuthenticationController {
     this.clientService = new ClientService();
   }
 
+  /**
+   * Método responsável por realizar a autenticação do usuário
+   * e a geração do token jwt para acesso aos demais endpoints
+   *
+   * @public
+   * @async
+   * @param {Request} req
+   * @param {Response} res
+   * @returns {Promise<Response>} Promise<Response>
+   */
   public async authenticate(req: Request, res: Response): Promise<Response> {
     const { secret, expiresIn } = authConfig.jwt;
 
@@ -60,6 +70,15 @@ class AuthenticationController {
     }
   }
 
+  /**
+   * Método responsável por realizar a atualização do token jwt
+   *
+   * @public
+   * @async
+   * @param {Request} req
+   * @param {Response} res
+   * @returns {Promise<Response>} Promise<Response>
+   */
   public async refreshtoken(req: Request, res: Response): Promise<Response> {
     const { secret, expiresIn } = authConfig.jwt;
 

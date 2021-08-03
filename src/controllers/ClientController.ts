@@ -12,6 +12,16 @@ class ClientController {
     this.service = new ClientService();
   }
 
+  /**
+   * Método responsável por realizar a criação de um cliente na base de dados
+   * e gerar o token jwt de acesso as APIs
+   *
+   * @public
+   * @async
+   * @param {Request} req
+   * @param {Response} res
+   * @returns {Promise<Response>} Promise<Response>
+   */
   public async store(req: Request, res: Response): Promise<Response> {
     const Schema = Yup.object().shape({
       name: Yup.string().max(60).required(),
@@ -45,6 +55,16 @@ class ClientController {
     });
   }
 
+  /**
+   * Método responsável por buscar todos os clientes da base,
+   * hoje está limitado ao usuário que está acessando a API
+   *
+   * @public
+   * @async
+   * @param {Request} req
+   * @param {Response} res
+   * @returns {Promise<Response>} Promise<Response>
+   */
   public async index(req: Request, res: Response): Promise<Response> {
     const clients = this.service.index({ id: req.clientId });
 
@@ -56,6 +76,15 @@ class ClientController {
     return res.status(200).json(clients);
   }
 
+  /**
+   * Método responsável por buscar um cliente com base no id fornecido
+   *
+   * @public
+   * @async
+   * @param {Request} req
+   * @param {Response} res
+   * @returns {Promise<Response>} Promise<Response>
+   */
   public async show(req: Request, res: Response): Promise<Response> {
     const client = this.service.show(req.params.id);
 
@@ -67,6 +96,16 @@ class ClientController {
     return res.status(200).json(client);
   }
 
+  /**
+   * Método responsável por atualizar os dados do cliente,
+   * hoje está liberado apenas o nome do cliente para atualização
+   *
+   * @public
+   * @async
+   * @param {Request} req
+   * @param {Response} res
+   * @returns {Promise<Response>} Promise<Response>
+   */
   public async update(req: Request, res: Response): Promise<Response> {
     const schema = Yup.object().shape({
       name: Yup.string().max(60).required(),
@@ -88,6 +127,15 @@ class ClientController {
     return res.status(200).json({ client });
   }
 
+  /**
+   * Método responsável por excluir um cliente da base de dados
+   *
+   * @public
+   * @async
+   * @param {Request} req
+   * @param {Response} res
+   * @returns {Promise<Response>} Promise<Response>
+   */
   public async delete(req: Request, res: Response): Promise<Response> {
     this.service.delete(req.params.id);
 

@@ -3,6 +3,14 @@ interface IError {
   code: number;
 }
 
+/**
+ * Classe responsável pelo lançamento manual de exceptions
+ *
+ * @class
+ * @param {number} statusCode 400
+ * @param {IError[] | string} error
+ *
+ */
 class AppError {
   public readonly message: string | undefined;
 

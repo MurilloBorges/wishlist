@@ -1,3 +1,9 @@
+/**
+ * Método responsável por mapear todas as possíveis exceções da aplicação
+ *
+ * @constant
+ * @returns {Object} Json
+ */
 const IErrors = {
   client: {
     exists: { error: 'Já existe uma conta vinculada a este e-mail.', code: 100001 },

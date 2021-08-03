@@ -11,6 +11,15 @@ class FavoriteProductService {
     this.repository = new FavoriteProductsRepository();
   }
 
+  /**
+   * Método responsável por adicionar um produto a lista de favoritos
+   * tendo como premissa o id do cliente e o id do produto
+   *
+   * @public
+   * @async
+   * @param {IFavoriteProduct} favoriteProduct
+   * @returns {Promise<IFavoriteProduct} Promise<IFavoriteProduct>
+   */
   public async store(favoriteProduct: IFavoriteProduct): Promise<IFavoriteProduct> {
     try {
       const favoritado = await this.index(favoriteProduct.client, {
@@ -28,6 +37,16 @@ class FavoriteProductService {
     }
   }
 
+  /**
+   * Método responsável por listar todos os produtos da lista de favoritos
+   * tendo como premissa o id do cliente na requisição
+   *
+   * @public
+   * @async
+   * @param {string} clientId
+   * @param {FilterQuery<IFavoriteProduct>} query
+   * @returns {Promise<IFavoriteProduct[]} Promise<IFavoriteProduct[]>
+   */
   public async index(
     clientId: string,
     query?: FilterQuery<IFavoriteProduct>,
@@ -40,6 +59,16 @@ class FavoriteProductService {
     }
   }
 
+  /**
+   * Método responsável por excluir um produto da lista de favoritos
+   * tendo como premissa o id do cliente e o id do favorito
+   *
+   * @public
+   * @async
+   * @param {string} clientId
+   * @param {string} id
+   * @returns {Promise<IFavoriteProduct | null>} Promise<IFavoriteProduct | null>
+   */
   public async show(clientId: string, id: string): Promise<IFavoriteProduct | null> {
     try {
       const result = await this.repository.show(clientId, id);
@@ -54,6 +83,16 @@ class FavoriteProductService {
     }
   }
 
+  /**
+   * Método responsável por buscar um produto da lista de favoritos
+   * tendo como premissa o id do cliente e o id do produto
+   *
+   * @public
+   * @async
+   * @param {string} clientId
+   * @param {string} id
+   * @returns {Promise<IFavoriteProduct | null>} Promise<IFavoriteProduct | null>
+   */
   public async showByProduct(clientId: string, id: string): Promise<IFavoriteProduct | null> {
     try {
       const result = await this.repository.showByProduct(clientId, id);
@@ -68,6 +107,16 @@ class FavoriteProductService {
     }
   }
 
+  /**
+   * Método responsável por excluir um produto da lista de favoritos
+   * tendo como premissa o id do cliente e o id do favorito
+   *
+   * @public
+   * @async
+   * @param {string} clientId
+   * @param {string} id
+   * @returns {Promise<IFavoriteProduct | null>} Promise<IFavoriteProduct | null>
+   */
   public async delete(clientId: string, id: string): Promise<IFavoriteProduct | null> {
     try {
       const client = await this.show(clientId, id);
@@ -83,6 +132,16 @@ class FavoriteProductService {
     }
   }
 
+  /**
+   * Método responsável por excluir um produto da lista de favoritos
+   * tendo como premissa o id do cliente e o id do produto
+   *
+   * @public
+   * @async
+   * @param {string} clientId
+   * @param {string} id
+   * @returns {Promise<IFavoriteProduct | null>} Promise<IFavoriteProduct | null>
+   */
   public async deleteByProduct(clientId: string, id: string): Promise<IFavoriteProduct | null> {
     try {
       const client = await this.showByProduct(clientId, id);

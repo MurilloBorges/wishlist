@@ -7,6 +7,16 @@ interface ValidationErrors {
   [key: string]: string[];
 }
 
+/**
+ * Método responsável interceptar exceções lançadas na classe AppError,
+ * e devolver para o cliente
+ *
+ * @constant
+ * @param {ValidationError | TokenExpiredError | AppError} error
+ * @param {Request} request
+ * @param {Response} response
+ * @returns {ErrorRequestHandler} Response
+ */
 const errorHandler: ErrorRequestHandler = (error, request, response) => {
   if (error instanceof ValidationError) {
     const errors: ValidationErrors = {};

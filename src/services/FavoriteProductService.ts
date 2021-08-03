@@ -1,8 +1,9 @@
-import AppError from 'errors/AppError';
-import IErrors from 'errors/IErrors';
-import { IFavoriteProduct } from 'models/FavoriteProducts';
 import { FilterQuery } from 'mongoose';
-import FavoriteProductsRepository from 'repositories/FavoriteProductsRepository';
+import AppError from '../errors/AppError';
+import IErrors from '../errors/IErrors';
+import logger from '../log/logger';
+import { IFavoriteProduct } from '../models/FavoriteProducts';
+import FavoriteProductsRepository from '../repositories/FavoriteProductsRepository';
 
 class FavoriteProductService {
   private repository: FavoriteProductsRepository;
@@ -33,6 +34,12 @@ class FavoriteProductService {
       const result = await this.repository.store(favoriteProduct);
       return result;
     } catch (error) {
+      logger.error('[FavoriteProductService][store] error', {
+        field: '[FavoriteProductService][store]',
+        favoriteProduct: JSON.stringify(favoriteProduct),
+        client: JSON.stringify({ id: favoriteProduct.client }),
+        error,
+      });
       throw new AppError(500, [IErrors.favoriteProduct.failedToStore]);
     }
   }
@@ -55,6 +62,12 @@ class FavoriteProductService {
       const result = await this.repository.list(clientId, query);
       return result;
     } catch (error) {
+      logger.error('[FavoriteProductService][index] error', {
+        field: '[FavoriteProductService][index]',
+        client: JSON.stringify({ id: clientId }),
+        favoriteProduct: JSON.stringify(query),
+        error,
+      });
       throw new AppError(500, [IErrors.favoriteProduct.failedToIndex]);
     }
   }
@@ -79,6 +92,12 @@ class FavoriteProductService {
 
       return result;
     } catch (error) {
+      logger.error('[FavoriteProductService][show] error', {
+        field: '[FavoriteProductService][show]',
+        client: JSON.stringify({ id: clientId }),
+        favoriteProduct: JSON.stringify({ id }),
+        error,
+      });
       throw new AppError(500, [IErrors.favoriteProduct.failedToShow]);
     }
   }
@@ -103,6 +122,12 @@ class FavoriteProductService {
 
       return result;
     } catch (error) {
+      logger.error('[FavoriteProductService][showByProduct] error', {
+        field: '[FavoriteProductService][showByProduct]',
+        client: JSON.stringify({ id: clientId }),
+        favoriteProduct: JSON.stringify({ productId: id }),
+        error,
+      });
       throw new AppError(500, [IErrors.favoriteProduct.failedToShow]);
     }
   }
@@ -128,6 +153,12 @@ class FavoriteProductService {
       const result = await this.repository.delete(clientId, id);
       return result;
     } catch (error) {
+      logger.error('[FavoriteProductService][delete] error', {
+        field: '[FavoriteProductService][delete]',
+        client: JSON.stringify({ id: clientId }),
+        favoriteProduct: JSON.stringify({ id }),
+        error,
+      });
       throw new AppError(500, [IErrors.favoriteProduct.failedToDelete]);
     }
   }
@@ -153,6 +184,12 @@ class FavoriteProductService {
       const result = await this.repository.deleteByProduct(clientId, id);
       return result;
     } catch (error) {
+      logger.error('[FavoriteProductService][deleteByProduct] error', {
+        field: '[FavoriteProductService][deleteByProduct]',
+        client: JSON.stringify({ id: clientId }),
+        favoriteProduct: JSON.stringify({ productId: id }),
+        error,
+      });
       throw new AppError(500, [IErrors.favoriteProduct.failedToDelete]);
     }
   }

@@ -2,6 +2,7 @@ import HttpClientChallenge from '../config/HttpClientChallenge';
 import { IProductInterface } from '../@types/ProductTypes';
 import AppError from '../errors/AppError';
 import IErrors from '../errors/IErrors';
+import logger from '../log/logger';
 
 export default class ProductService extends HttpClientChallenge {
   private static classInstance?: ProductService;
@@ -39,6 +40,10 @@ export default class ProductService extends HttpClientChallenge {
       }
       return res.data;
     } catch (error) {
+      logger.error('[ProductService][index] error', {
+        field: '[ProductService][index]',
+        error,
+      });
       throw new AppError(500, [IErrors.product.failedToIndex]);
     }
   }
@@ -61,6 +66,11 @@ export default class ProductService extends HttpClientChallenge {
       }
       return res.data;
     } catch (error) {
+      logger.error('[ProductService][show] error', {
+        field: '[ProductService][show]',
+        product: JSON.stringify({ id }),
+        error,
+      });
       throw new AppError(500, [IErrors.product.faliedToShow]);
     }
   }

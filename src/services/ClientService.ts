@@ -1,7 +1,8 @@
-import AppError from 'errors/AppError';
-import IErrors from 'errors/IErrors';
-import { IClient } from 'models/Clients';
 import { FilterQuery } from 'mongoose';
+import logger from '../log/logger';
+import { IClient } from '../models/Clients';
+import AppError from '../errors/AppError';
+import IErrors from '../errors/IErrors';
 import ClientsRepository from '../repositories/ClientsRepository';
 
 class ClientService {
@@ -30,6 +31,11 @@ class ClientService {
       const result = await this.repository.store(client);
       return result;
     } catch (error) {
+      logger.error('[ClientService][store] error', {
+        field: '[ClientService][store]',
+        client: JSON.stringify(client),
+        error,
+      });
       throw new AppError(500, [IErrors.client.failedToStore]);
     }
   }
@@ -49,6 +55,11 @@ class ClientService {
       const result = await this.repository.list(query);
       return result;
     } catch (error) {
+      logger.error('[ClientService][index] error', {
+        field: '[ClientService][index]',
+        client: JSON.stringify(query),
+        error,
+      });
       throw new AppError(500, [IErrors.client.failedToIndex]);
     }
   }
@@ -72,6 +83,11 @@ class ClientService {
 
       return result;
     } catch (error) {
+      logger.error('[ClientService][show] error', {
+        field: '[ClientService][show]',
+        client: JSON.stringify({ id }),
+        error,
+      });
       throw new AppError(500, [IErrors.client.failedToShow]);
     }
   }
@@ -97,6 +113,11 @@ class ClientService {
 
       return result;
     } catch (error) {
+      logger.error('[ClientService][update] error', {
+        field: '[ClientService][update]',
+        client: JSON.stringify({ ...client, id }),
+        error,
+      });
       throw new AppError(500, [IErrors.client.failedToUpdate]);
     }
   }
@@ -122,6 +143,11 @@ class ClientService {
 
       return result;
     } catch (error) {
+      logger.error('[ClientService][updateName] error', {
+        field: '[ClientService][updateName]',
+        client: JSON.stringify({ id, name }),
+        error,
+      });
       throw new AppError(500, [IErrors.client.failedToUpdate]);
     }
   }
@@ -145,6 +171,11 @@ class ClientService {
       const result = await this.repository.delete(id);
       return result;
     } catch (error) {
+      logger.error('[ClientService][delete] error', {
+        field: '[ClientService][delete]',
+        client: JSON.stringify({ id }),
+        error,
+      });
       throw new AppError(500, [IErrors.client.failedToDelete]);
     }
   }

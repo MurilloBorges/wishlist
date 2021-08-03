@@ -6,10 +6,27 @@ import IErrors from '../errors/IErrors';
 import ClientsRepository from '../repositories/ClientsRepository';
 
 class ClientService {
+  private static classInstance?: ClientService;
+
   private repository: ClientsRepository;
 
   constructor() {
     this.repository = new ClientsRepository();
+  }
+
+  /**
+   * Método responsável por criar uma nova instância da classe ClientService
+   *
+   * @public
+   * @static
+   * @returns {ClientService} ClientService
+   */
+  public static getInstance(): ClientService {
+    if (!this.classInstance) {
+      this.classInstance = new ClientService();
+    }
+
+    return this.classInstance;
   }
 
   /**
@@ -21,13 +38,13 @@ class ClientService {
    * @returns {Promise<IClient>} Promise<IClient>
    */
   public async store(client: IClient): Promise<IClient> {
+    const existsClient = await this.index({ email: client.email });
+
+    if (existsClient.length >= 1) {
+      throw new AppError(400, [IErrors.client.exists]);
+    }
+
     try {
-      const existsClient = await this.index({ email: client.email });
-
-      if (existsClient.length >= 1) {
-        throw new AppError(400, [IErrors.client.exists]);
-      }
-
       const result = await this.repository.store(client);
       return result;
     } catch (error) {
@@ -102,13 +119,13 @@ class ClientService {
    * @returns {Promise<IClient | null>} Promise<IClient | null>
    */
   public async update(id: string, client: IClient): Promise<IClient | null> {
+    const existsClient = await this.show(id);
+
+    if (!existsClient) {
+      throw new AppError(404, [IErrors.client.notFound]);
+    }
+
     try {
-      const existsClient = await this.show(id);
-
-      if (!existsClient) {
-        throw new AppError(404, [IErrors.client.notFound]);
-      }
-
       const result = await this.repository.update(id, client);
 
       return result;
@@ -132,13 +149,13 @@ class ClientService {
    * @returns {Promise<IClient | null>} Promise<IClient | null>
    */
   public async updateName(id: string, name: string): Promise<IClient | null> {
+    const client = await this.show(id);
+
+    if (!client) {
+      throw new AppError(404, [IErrors.client.notFound]);
+    }
+
     try {
-      const client = await this.show(id);
-
-      if (!client) {
-        throw new AppError(404, [IErrors.client.notFound]);
-      }
-
       const result = await this.repository.updateName(id, name);
 
       return result;
@@ -161,13 +178,13 @@ class ClientService {
    * @returns {Promise<IClient | null>} Promise<IClient | null>
    */
   public async delete(id: string): Promise<IClient | null> {
+    const client = await this.show(id);
+
+    if (!client) {
+      throw new AppError(404, [IErrors.client.notFound]);
+    }
+
     try {
-      const client = await this.show(id);
-
-      if (!client) {
-        throw new AppError(404, [IErrors.client.notFound]);
-      }
-
       const result = await this.repository.delete(id);
       return result;
     } catch (error) {

@@ -22,15 +22,15 @@ class FavoriteProductService {
    * @returns {Promise<IFavoriteProduct} Promise<IFavoriteProduct>
    */
   public async store(favoriteProduct: IFavoriteProduct): Promise<IFavoriteProduct> {
+    const favoritado = await this.index(favoriteProduct.client, {
+      productId: favoriteProduct.productId,
+    });
+
+    if (favoritado.length >= 1) {
+      throw new AppError(400, [IErrors.favoriteProduct.exists]);
+    }
+
     try {
-      const favoritado = await this.index(favoriteProduct.client, {
-        productId: favoriteProduct.productId,
-      });
-
-      if (favoritado.length >= 1) {
-        throw new AppError(400, [IErrors.favoriteProduct.exists]);
-      }
-
       const result = await this.repository.store(favoriteProduct);
       return result;
     } catch (error) {
@@ -143,13 +143,13 @@ class FavoriteProductService {
    * @returns {Promise<IFavoriteProduct | null>} Promise<IFavoriteProduct | null>
    */
   public async delete(clientId: string, id: string): Promise<IFavoriteProduct | null> {
+    const client = await this.show(clientId, id);
+
+    if (!client) {
+      throw new AppError(404, [IErrors.favoriteProduct.notFound]);
+    }
+
     try {
-      const client = await this.show(clientId, id);
-
-      if (!client) {
-        throw new AppError(404, [IErrors.favoriteProduct.notFound]);
-      }
-
       const result = await this.repository.delete(clientId, id);
       return result;
     } catch (error) {
@@ -174,13 +174,13 @@ class FavoriteProductService {
    * @returns {Promise<IFavoriteProduct | null>} Promise<IFavoriteProduct | null>
    */
   public async deleteByProduct(clientId: string, id: string): Promise<IFavoriteProduct | null> {
+    const client = await this.showByProduct(clientId, id);
+
+    if (!client) {
+      throw new AppError(404, [IErrors.favoriteProduct.notFound]);
+    }
+
     try {
-      const client = await this.showByProduct(clientId, id);
-
-      if (!client) {
-        throw new AppError(404, [IErrors.favoriteProduct.notFound]);
-      }
-
       const result = await this.repository.deleteByProduct(clientId, id);
       return result;
     } catch (error) {

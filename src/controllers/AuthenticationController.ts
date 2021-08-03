@@ -1,9 +1,9 @@
 /* eslint-disable no-underscore-dangle */
 import * as Yup from 'yup';
-import AppError from 'errors/AppError';
-import IErrors from 'errors/IErrors';
 import { Request, Response } from 'express';
-import ClientService from 'services/ClientService';
+import AppError from '../errors/AppError';
+import IErrors from '../errors/IErrors';
+import ClientService from '../services/ClientService';
 
 import authConfig from '../config/auth';
 import { generateToken } from '../middlewares/auth';

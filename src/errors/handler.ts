@@ -17,7 +17,7 @@ interface ValidationErrors {
  * @param {Response} response
  * @returns {ErrorRequestHandler} Response
  */
-const errorHandler: ErrorRequestHandler = (error, request, response) => {
+const errorHandler: ErrorRequestHandler = (error, request, response, next) => {
   if (error instanceof ValidationError) {
     const errors: ValidationErrors = {};
 
@@ -32,7 +32,7 @@ const errorHandler: ErrorRequestHandler = (error, request, response) => {
   }
 
   if (error instanceof AppError) {
-    if (error instanceof Array) {
+    if (error.errors && error.errors instanceof Array) {
       return response.status(error.statusCode).json({ errors: error.errors });
     }
 

@@ -1,7 +1,7 @@
-import AppError from 'errors/AppError';
-import IErrors from 'errors/IErrors';
 import { Response, Request, NextFunction } from 'express';
 import * as jwt from 'jsonwebtoken';
+import AppError from '../errors/AppError';
+import IErrors from '../errors/IErrors';
 
 import authConfig from '../config/auth';
 import logger from '../log/logger';

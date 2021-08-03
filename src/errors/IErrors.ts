@@ -21,6 +21,8 @@ const IErrors = {
   product: {
     notFound: { error: 'Produto não encontrado.', code: 300001 },
     notFoundAll: { error: 'Nenhum produto encontrado.', code: 300002 },
+    failedToIndex: { error: 'Falha ao buscar produtos', code: 300003 },
+    faliedToShow: { error: 'Falha ao buscar produto.', code: 300004 },
   },
   favoriteProduct: {
     exists: { error: 'Produto já adicionado a lista de favoritos.', code: 400001 },

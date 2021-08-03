@@ -30,5 +30,5 @@ export default mongoose
       field: '[application]',
       err,
     });
-    await Mail.configureMail();
+    // await Mail.configureMail();
   });

@@ -9,7 +9,8 @@ const esTransportOpts = {
   index: process.env.LOG_INDEX,
   level: 'info',
   clientOpts: {
-    host: process.env.LOG_ELASLICSEARCH_HOST,
+    // https://cloud.elastic.co/login?redirectTo=%2Fdeployments%2Fe17c521ed00540808e29465d9289966d
+    host: 'https://logs-wishlist-api.es.eastus2.azure.elastic-cloud.com:9243',
     log: 'info',
     httpAuth: `${process.env.LOG_PASSWORD}`,
   },

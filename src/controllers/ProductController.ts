@@ -1,10 +1,21 @@
 import { Response, Request } from 'express';
-import * as Yup from 'yup';
 import ProductService from '../services/ProductService';
 
 class ProductController {
-  public async index(req: Request, res: Response): Promise<Response> {}
+  private readonly service: ProductService;
 
-  public async show(req: Request, res: Response): Promise<Response> {}
+  constructor() {
+    this.service = ProductService.getInstance();
+  }
+
+  public async index(req: Request, res: Response): Promise<Response> {
+    const products = await this.service.index(parseInt(req.params.page, 10));
+    return res.status(200).json(products);
+  }
+
+  public async show(req: Request, res: Response): Promise<Response> {
+    const product = await this.service.show(req.params.id);
+    return res.status(200).json(product);
+  }
 }
 export default new ProductController();

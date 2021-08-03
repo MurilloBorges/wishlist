@@ -22,6 +22,12 @@ export async function generateToken(
 
     return token;
   } catch (error) {
+    logger.info('[generateToken] error', {
+      field: '[generateToken]',
+      clientId: params.clientId || null,
+      statusCode: 401,
+      statusText: 'Unauthorized',
+    });
     throw new AppError(500, [IErrors.auth.failedGenerateToken]);
   }
 }
@@ -36,6 +42,11 @@ export function decodeToken(
 
     return data as { clientId: string; exp: number };
   } catch (error) {
+    logger.info('[decodeToken] error', {
+      field: '[decodeToken]',
+      statusCode: 401,
+      statusText: 'Unauthorized',
+    });
     throw new AppError(401, [IErrors.auth.expiredToken]);
   }
 }
@@ -44,18 +55,42 @@ export default function ensureAuthenticated(req: Request, res: Response, next: N
   const { authorization } = req.headers;
 
   if (!authorization) {
+    logger.info('[ensureAuthenticated] jwt is missing', {
+      field: '[ensureAuthenticated]',
+      clientId: req.clientId || null,
+      token: authorization || null,
+      originalUrl: req.originalUrl || null,
+      ip: req.headers['x-forwarded-for'] || req.socket.remoteAddress || null,
+    });
+
     throw new AppError(401, [IErrors.auth.jwt]);
   }
 
   const parts = authorization.split(' ');
 
   if (parts.length !== 2) {
+    logger.info('[ensureAuthenticated] token inválido', {
+      field: '[ensureAuthenticated]',
+      clientId: req.clientId || null,
+      token: authorization || null,
+      originalUrl: req.originalUrl || null,
+      ip: req.headers['x-forwarded-for'] || req.socket.remoteAddress || null,
+    });
+
     throw new AppError(401, [IErrors.auth.tokenInvalid]);
   }
 
   const [scheme, token] = parts;
 
   if (!/^Bearer$/i.test(scheme) || !token) {
+    logger.info('[ensureAuthenticated] token inválido', {
+      field: '[ensureAuthenticated]',
+      clientId: req.clientId || null,
+      token: authorization || null,
+      originalUrl: req.originalUrl || null,
+      ip: req.headers['x-forwarded-for'] || req.socket.remoteAddress || null,
+    });
+
     throw new AppError(401, [IErrors.auth.tokenInvalid]);
   }
 
@@ -63,10 +98,8 @@ export default function ensureAuthenticated(req: Request, res: Response, next: N
 
   req.clientId = data.clientId;
 
-  logger.info('jwt authentication', {
-    field: '[authenticate]',
-    statusCode: 401,
-    statusText: 'Unauthorized',
+  logger.info('[ensureAuthenticated] jwt authentication', {
+    field: '[ensureAuthenticated]',
     clientId: req.clientId || null,
     token: authorization || null,
     originalUrl: req.originalUrl || null,

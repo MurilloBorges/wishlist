@@ -7,6 +7,7 @@ import ClientService from 'services/ClientService';
 
 import authConfig from '../config/auth';
 import { generateToken } from '../middlewares/auth';
+import logger from '../log/logger';
 
 class AuthenticationController {
   private readonly clientService: ClientService;
@@ -43,8 +44,18 @@ class AuthenticationController {
         clientId: client[0].id as string,
       });
 
+      logger.info('[AuthenticationController][authenticate] token jwt gerado com sucesso', {
+        field: '[AuthenticationController][authenticate]',
+        client: JSON.stringify(client[0]),
+        token,
+      });
+
       return res.status(200).json({ token });
     } catch (error) {
+      logger.info('[AuthenticationController][authenticate] token jwt gerado com sucesso', {
+        field: '[AuthenticationController][authenticate]',
+        client: JSON.stringify({ email }),
+      });
       throw new AppError(500, [IErrors.auth.failedGenerateToken]);
     }
   }
@@ -67,8 +78,18 @@ class AuthenticationController {
 
       const token = await generateToken(secret as string, expiresIn, { clientId });
 
+      logger.info('[AuthenticationController][refreshtoken] token jwt atualizado com sucesso', {
+        field: '[AuthenticationController][refreshtoken]',
+        client: JSON.stringify(client),
+        token,
+      });
+
       return res.status(200).json({ token });
     } catch (error) {
+      logger.info('[AuthenticationController][refreshtoken] token jwt atualizado com sucesso', {
+        field: '[AuthenticationController][refreshtoken]',
+        client: JSON.stringify({ id: req.clientId }),
+      });
       throw new AppError(500, [IErrors.auth.failedRefreshToken]);
     }
   }

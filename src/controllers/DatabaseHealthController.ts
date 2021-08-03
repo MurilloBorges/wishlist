@@ -1,7 +1,8 @@
 import { Response, Request } from 'express';
 import mongoose from 'mongoose';
+import logger from '../log/logger';
 
-class DatabaseHealth {
+class DatabaseHealthController {
   /**
    * Método responsável por obter o status da aplicação
    * e o status de conexão com o banco de dados
@@ -24,6 +25,17 @@ class DatabaseHealth {
       isError = true;
     }
     const status = isError ? 500 : 200;
+
+    logger.info(
+      '[DatabaseHealthController][datahealth] obtendo status da aplicação e do banco de dados',
+      {
+        field: '[DatabaseHealthController][datahealth]',
+        clientId: req.clientId || null,
+        originalUrl: req.originalUrl || null,
+        ip: req.headers['x-forwarded-for'] || req.socket.remoteAddress || null,
+      },
+    );
+
     return res.status(status).json({
       status: {
         database: mongoose.STATES[mongoose.connection.readyState],
@@ -32,4 +44,4 @@ class DatabaseHealth {
     });
   }
 }
-export default new DatabaseHealth();
+export default new DatabaseHealthController();

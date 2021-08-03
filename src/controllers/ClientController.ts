@@ -139,7 +139,7 @@ class ClientController {
       client: JSON.stringify(client),
     });
 
-    return res.status(200).json({ client });
+    return res.status(200).json(client);
   }
 
   /**

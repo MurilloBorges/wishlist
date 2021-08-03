@@ -91,14 +91,9 @@ class ClientService {
    * @returns {Promise<IClient | null>} Promise<IClient | null>
    */
   public async show(id: string): Promise<IClient | null> {
+    let result = null;
     try {
-      const result = await this.repository.show(id);
-
-      if (!result) {
-        throw new AppError(404, [IErrors.client.notFound]);
-      }
-
-      return result;
+      result = await this.repository.show(id);
     } catch (error) {
       logger.error('[ClientService][show] error', {
         field: '[ClientService][show]',
@@ -107,6 +102,12 @@ class ClientService {
       });
       throw new AppError(500, [IErrors.client.failedToShow]);
     }
+
+    if (!result) {
+      throw new AppError(404, [IErrors.client.notFound]);
+    }
+
+    return result;
   }
 
   /**
@@ -119,11 +120,7 @@ class ClientService {
    * @returns {Promise<IClient | null>} Promise<IClient | null>
    */
   public async update(id: string, client: IClient): Promise<IClient | null> {
-    const existsClient = await this.show(id);
-
-    if (!existsClient) {
-      throw new AppError(404, [IErrors.client.notFound]);
-    }
+    await this.show(id);
 
     try {
       const result = await this.repository.update(id, client);
@@ -149,11 +146,7 @@ class ClientService {
    * @returns {Promise<IClient | null>} Promise<IClient | null>
    */
   public async updateName(id: string, name: string): Promise<IClient | null> {
-    const client = await this.show(id);
-
-    if (!client) {
-      throw new AppError(404, [IErrors.client.notFound]);
-    }
+    await this.show(id);
 
     try {
       const result = await this.repository.updateName(id, name);
@@ -178,11 +171,7 @@ class ClientService {
    * @returns {Promise<IClient | null>} Promise<IClient | null>
    */
   public async delete(id: string): Promise<IClient | null> {
-    const client = await this.show(id);
-
-    if (!client) {
-      throw new AppError(404, [IErrors.client.notFound]);
-    }
+    await this.show(id);
 
     try {
       const result = await this.repository.delete(id);

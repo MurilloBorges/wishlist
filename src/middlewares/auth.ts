@@ -67,7 +67,11 @@ export function decodeToken(
       statusCode: 401,
       statusText: 'Unauthorized',
     });
-    throw new AppError(401, [IErrors.auth.expiredToken]);
+    if (error instanceof jwt.TokenExpiredError) {
+      throw new AppError(401, [IErrors.auth.expiredToken]);
+    } else {
+      throw new AppError(401, [IErrors.auth.tokenInvalid]);
+    }
   }
 }
 

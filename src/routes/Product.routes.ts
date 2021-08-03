@@ -6,7 +6,7 @@ import ProductController from '../controllers/ProductController';
 const Product = Router();
 
 // Products
-Product.get('/?page=:page', authMiddleware, ProductController.index);
+Product.get('/', authMiddleware, ProductController.index);
 Product.get('/:id', authMiddleware, ProductController.show);
 
 // Favorites Products

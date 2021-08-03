@@ -1,9 +1,11 @@
+import AppError from 'errors/AppError';
+import IErrors from 'errors/IErrors';
 import { Response, Request } from 'express';
 import logger from '../log/logger';
 import ProductService from '../services/ProductService';
 
 class ProductController {
-  private readonly service: ProductService;
+  private service: ProductService;
 
   constructor() {
     this.service = ProductService.getInstance();
@@ -20,7 +22,15 @@ class ProductController {
    * @returns {Promise<Response>} Promise<Response>
    */
   public async index(req: Request, res: Response): Promise<Response> {
-    const products = await this.service.index(parseInt(req.params.page, 10));
+    const { page } = req.query;
+
+    const pag = parseInt(page as string, 10);
+    if (page && Number.isNaN(pag)) {
+      throw new AppError(400, [IErrors.product.invalidPage]);
+    }
+
+    this.service = ProductService.getInstance();
+    const products = await this.service.index(page ? pag : 1);
 
     logger.info('[ProductController][index] produtos listados com sucesso', {
       field: '[ProductController][index]',
@@ -41,6 +51,7 @@ class ProductController {
    * @returns {Promise<Response>} Promise<Response>
    */
   public async show(req: Request, res: Response): Promise<Response> {
+    this.service = ProductService.getInstance();
     const product = await this.service.show(req.params.id);
 
     logger.info('[ProductController][show] produto listado com sucesso', {

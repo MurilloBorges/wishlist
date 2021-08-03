@@ -10,10 +10,10 @@ import { generateToken } from '../middlewares/auth';
 import logger from '../log/logger';
 
 class AuthenticationController {
-  private readonly clientService: ClientService;
+  private clientService: ClientService;
 
   constructor() {
-    this.clientService = new ClientService();
+    this.clientService = ClientService.getInstance();
   }
 
   /**
@@ -37,19 +37,16 @@ class AuthenticationController {
       abortEarly: false,
     });
 
-    if (!(await schema.isValid(req.body))) {
-      throw new AppError(400, [IErrors.auth.failed]);
-    }
-
     const { email } = req.body;
 
+    this.clientService = ClientService.getInstance();
+    const client = await this.clientService.index({ email });
+
+    if (!client || client.length === 0) {
+      throw new AppError(404, [IErrors.client.notFound]);
+    }
+
     try {
-      const client = await this.clientService.index({ email });
-
-      if (!client || client.length === 0) {
-        throw new AppError(404, [IErrors.client.notFound]);
-      }
-
       const token = await generateToken(secret as string, expiresIn, {
         clientId: client[0].id as string,
       });
@@ -62,9 +59,10 @@ class AuthenticationController {
 
       return res.status(200).json({ token });
     } catch (error) {
-      logger.info('[AuthenticationController][authenticate] token jwt gerado com sucesso', {
+      logger.info('[AuthenticationController][authenticate] error', {
         field: '[AuthenticationController][authenticate]',
         client: JSON.stringify({ email }),
+        error,
       });
       throw new AppError(500, [IErrors.auth.failedGenerateToken]);
     }
@@ -88,13 +86,14 @@ class AuthenticationController {
 
     const { clientId } = req;
 
+    this.clientService = ClientService.getInstance();
+    const client = await this.clientService.show(clientId);
+
+    if (!client) {
+      throw new AppError(404, [IErrors.client.notFound]);
+    }
+
     try {
-      const client = await this.clientService.show(clientId);
-
-      if (!client) {
-        throw new AppError(404, [IErrors.client.notFound]);
-      }
-
       const token = await generateToken(secret as string, expiresIn, { clientId });
 
       logger.info('[AuthenticationController][refreshtoken] token jwt atualizado com sucesso', {
@@ -105,9 +104,10 @@ class AuthenticationController {
 
       return res.status(200).json({ token });
     } catch (error) {
-      logger.info('[AuthenticationController][refreshtoken] token jwt atualizado com sucesso', {
+      logger.info('[AuthenticationController][refreshtoken] error', {
         field: '[AuthenticationController][refreshtoken]',
         client: JSON.stringify({ id: req.clientId }),
+        error,
       });
       throw new AppError(500, [IErrors.auth.failedRefreshToken]);
     }

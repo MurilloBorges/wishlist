@@ -32,20 +32,23 @@ export default class ProductService extends HttpClientChallenge {
    * @returns {Promise<IProductInterface[]>} Promise<IProductInterface[]>
    */
   public async index(page = 1): Promise<IProductInterface[]> {
+    let res = null;
     try {
-      const res = await this.instance.get(`/product/?page=${page}`);
-
-      if (res.status !== 200) {
-        throw new AppError(200, [IErrors.product.notFoundAll]);
-      }
-      return res.data;
+      res = await this.instance.get(`/product/?page=${page}`);
     } catch (error) {
       logger.error('[ProductService][index] error', {
         field: '[ProductService][index]',
         error,
       });
+      if (error.response && error.response.status === 404) {
+        throw new AppError(404, [IErrors.product.notFoundAll]);
+      }
       throw new AppError(500, [IErrors.product.failedToIndex]);
     }
+    if (res && res.status === 200 && Object.values(res.data.products).length === 0) {
+      throw new AppError(404, [IErrors.product.notFoundAll]);
+    }
+    return res.data;
   }
 
   /**
@@ -58,20 +61,25 @@ export default class ProductService extends HttpClientChallenge {
    * @returns {Promise<IProductInterface>} Promise<IProductInterface>
    */
   public async show(id: string): Promise<IProductInterface> {
+    let res = null;
     try {
-      const res = await this.instance.get<IProductInterface>(`/product/${id}/`);
-
-      if (res.status !== 200) {
-        throw new AppError(404, [IErrors.product.notFoundAll]);
-      }
-      return res.data;
+      res = await this.instance.get<IProductInterface>(`/product/${id}/`);
     } catch (error) {
       logger.error('[ProductService][show] error', {
         field: '[ProductService][show]',
         product: JSON.stringify({ id }),
         error,
       });
+      if (error.response && error.response.status === 404) {
+        throw new AppError(404, [IErrors.product.notFoundAll]);
+      }
       throw new AppError(500, [IErrors.product.faliedToShow]);
     }
+
+    if (res && res.status === 200 && Object.values(res.data).length === 0) {
+      throw new AppError(404, [IErrors.product.notFoundAll]);
+    }
+
+    return res.data;
   }
 }

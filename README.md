@@ -8,7 +8,7 @@ Eu como cliente quero poder visualizar a minha lista de produtos favoritos, pode
 
 # Requisitos para a execução do projeto
 
-- Ter o NodeJS instalado de preferência a última versão ou superior a v12.16.1;
+- Ter o Node instalado de preferência a última versão ou superior a v12.16.1;
 
   > [Instalando o Node](https://nodejs.org/pt-br/download/package-manager/ 'Clique aqui para aprender a instalar o Node!')
 

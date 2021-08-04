@@ -1,5 +1,6 @@
-import Constants from 'constants/Constants';
 import { FilterQuery } from 'mongoose';
+
+import Constants from '../constants/Constants';
 import AppError from '../errors/AppError';
 import IErrors from '../errors/IErrors';
 import logger from '../log/logger';

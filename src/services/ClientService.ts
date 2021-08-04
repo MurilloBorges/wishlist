@@ -4,6 +4,7 @@ import { IClient } from '../models/Clients';
 import AppError from '../errors/AppError';
 import IErrors from '../errors/IErrors';
 import ClientsRepository from '../repositories/ClientsRepository';
+import MailService from './mail.service';
 
 class ClientService {
   private static classInstance?: ClientService;
@@ -44,9 +45,9 @@ class ClientService {
       throw new AppError(400, [IErrors.client.exists]);
     }
 
+    let result = null;
     try {
-      const result = await this.repository.store(client);
-      return result;
+      result = await this.repository.store(client);
     } catch (error) {
       logger.error('[ClientService][store] error', {
         field: '[ClientService][store]',
@@ -55,6 +56,13 @@ class ClientService {
       });
       throw new AppError(500, [IErrors.client.failedToStore]);
     }
+
+    const subject = 'Ativação de conta - Wishlist';
+    const message = `<b style="">Oi ${result.name}</b> </br></br> Sua conta na Wishlist está quase pronta. Para ativá-la, por favor confirme o seu endereço de e-mail clicando no link abaixo. </br></br> <span><b><a href="http://localhost:3333/clients/${result.id}/email/confirmation" target="_blank" rel="noopener noreferrer" data-auth="NotApplicable" title="http://localhost:3333/clients/:id/email/confirmation/:confirmation" data-linkindex="0" data-ogsc="" style="color: rgb(228, 159, 255);">Ativar minha conta/Confirmar meu e-mail</a><br></b></span> </br></br> <b style="">Sua conta não será ativada até que seu e-mail seja confirmado.</b> </br></br> <b>Se você não se cadastrou na wishlist recentemente, por favor ignore este email.</b> </br></br> Agradecemos desde já, </br></br> Atenciosamente, Wishlist!`;
+    const mail = new MailService(result.email, subject, message);
+    mail.sendMail();
+
+    return result;
   }
 
   /**
@@ -68,9 +76,9 @@ class ClientService {
    * @returns {Promise<IClient[]>} Promise<IClient[]>
    */
   public async index(query?: FilterQuery<IClient>): Promise<IClient[]> {
+    let result = null;
     try {
-      const result = await this.repository.list(query);
-      return result;
+      result = await this.repository.list(query);
     } catch (error) {
       logger.error('[ClientService][index] error', {
         field: '[ClientService][index]',
@@ -79,6 +87,10 @@ class ClientService {
       });
       throw new AppError(500, [IErrors.client.failedToIndex]);
     }
+
+    const clients = result.filter(data => data.emailConfirmation);
+
+    return clients;
   }
 
   /**
@@ -88,9 +100,10 @@ class ClientService {
    * @public
    * @async
    * @param {string} id
+   * @param {boolean} skipConfirmation
    * @returns {Promise<IClient | null>} Promise<IClient | null>
    */
-  public async show(id: string): Promise<IClient | null> {
+  public async show(id: string, skipConfirmation = false): Promise<IClient | null> {
     let result = null;
     try {
       result = await this.repository.show(id);
@@ -107,6 +120,10 @@ class ClientService {
       throw new AppError(404, [IErrors.client.notFound]);
     }
 
+    if (!skipConfirmation && !result.emailConfirmation) {
+      throw new AppError(400, [IErrors.client.notEmailConfirmation]);
+    }
+
     return result;
   }
 
@@ -120,8 +137,6 @@ class ClientService {
    * @returns {Promise<IClient | null>} Promise<IClient | null>
    */
   public async update(id: string, client: IClient): Promise<IClient | null> {
-    await this.show(id);
-
     try {
       const result = await this.repository.update(id, client);
 
@@ -146,8 +161,6 @@ class ClientService {
    * @returns {Promise<IClient | null>} Promise<IClient | null>
    */
   public async updateName(id: string, name: string): Promise<IClient | null> {
-    await this.show(id);
-
     try {
       const result = await this.repository.updateName(id, name);
 
@@ -171,8 +184,6 @@ class ClientService {
    * @returns {Promise<IClient | null>} Promise<IClient | null>
    */
   public async delete(id: string): Promise<IClient | null> {
-    await this.show(id);
-
     try {
       const result = await this.repository.delete(id);
       return result;
@@ -183,6 +194,31 @@ class ClientService {
         error,
       });
       throw new AppError(500, [IErrors.client.failedToDelete]);
+    }
+  }
+
+  /**
+   * Método responsável por realizar a confirmação de conta do cliente por e-mail
+   *
+   * @public
+   * @async
+   * @param {string} id
+   * @returns {Promise<IClient | null>} Promise<IClient | null>
+   */
+  public async emailConfirmation(id: string): Promise<IClient | null> {
+    await this.show(id, true);
+
+    try {
+      const result = await this.repository.updateEmailConfirmation(id);
+
+      return result;
+    } catch (error) {
+      logger.error('[ClientService][emailConfirmation] error', {
+        field: '[ClientService][emailConfirmation]',
+        client: JSON.stringify({ id }),
+        error,
+      });
+      throw new AppError(500, [IErrors.client.failedToEmailConfirmation]);
     }
   }
 }

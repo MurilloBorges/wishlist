@@ -13,6 +13,17 @@ const IErrors = {
     failedToDelete: { error: 'Falha ao excluir cliente.', code: 100005 },
     failedToShow: { error: 'Falha ao buscar cliente.', code: 100006 },
     failedToUpdate: { error: 'Falha ao alterar cliente.', code: 100006 },
+    failedToSendEmail: { error: 'Falha ao enviar e-mail de ativação da conta.', code: 100007 },
+    failedToEmailConfirmation: {
+      error: 'Falha ao ativar conta por e-mail.',
+      code: 100008,
+    },
+    notFoundAll: { error: 'Nenhum cliente encontrado.', code: 100009 },
+    notEmailConfirmation: {
+      error:
+        'Conta não ativada, por favor verifique seu e-mail para a confirmação do seu cadastro!',
+      code: 100010,
+    },
   },
   auth: {
     jwt: { error: 'JWT is missing.', code: 200001 },

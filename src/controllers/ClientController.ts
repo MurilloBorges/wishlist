@@ -24,7 +24,7 @@ class ClientController {
    * @param {NextFunction} next
    * @returns {Promise<Response>} Promise<Response>
    */
-  public async store(req: Request, res: Response, next: NextFunction): Promise<Response> {
+  public async store(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
     const schema = Yup.object().shape({
       name: Yup.string().max(60).required(),
       email: Yup.string().email().max(60).required(),
@@ -35,7 +35,7 @@ class ClientController {
         abortEarly: false,
       });
     } catch (error) {
-      errorHandler(error, req, res, next);
+      return errorHandler(error, req, res, next);
     }
 
     this.service = ClientService.getInstance();
@@ -116,7 +116,7 @@ class ClientController {
    * @param {NextFunction} next
    * @returns {Promise<Response>} Promise<Response>
    */
-  public async update(req: Request, res: Response, next: NextFunction): Promise<Response> {
+  public async update(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
     const schema = Yup.object().shape({
       name: Yup.string().max(60).required(),
     });
@@ -126,7 +126,7 @@ class ClientController {
         abortEarly: false,
       });
     } catch (error) {
-      errorHandler(error, req, res, next);
+      return errorHandler(error, req, res, next);
     }
 
     const { name } = req.body;
@@ -161,6 +161,27 @@ class ClientController {
     });
 
     return res.status(204).json();
+  }
+
+  /**
+   * Método responsável por ativar a conta de um cliente
+   *
+   * @public
+   * @async
+   * @param {Request} req
+   * @param {Response} res
+   * @returns {Promise<Response>} Promise<Response>
+   */
+  public async emailConfirmation(req: Request, res: Response): Promise<Response> {
+    this.service = ClientService.getInstance();
+    const client = await this.service.emailConfirmation(req.params.id);
+
+    logger.info('[ClientController][emailConfirmation] conta cliente ativada com sucesso', {
+      field: '[ClientController][emailConfirmation]',
+      client: JSON.stringify(client),
+    });
+
+    return res.status(200).json({ message: 'Parabéns! Sua conta foi ativada com sucesso!' });
   }
 }
 export default new ClientController();

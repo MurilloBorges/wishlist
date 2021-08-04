@@ -4,6 +4,7 @@ export interface IClient extends Document {
   id?: string;
   name: string;
   email: string;
+  emailConfirmation: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -19,6 +20,11 @@ const ClientSchema = new Schema(
       required: true,
       unique: true,
       lowercase: true,
+    },
+    emailConfirmation: {
+      type: Boolean,
+      required: true,
+      default: false,
     },
   },
   {

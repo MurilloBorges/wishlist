@@ -1,43 +1,66 @@
 import * as nodemailer from 'nodemailer';
-import Constants from '../constants/Constants';
 
-class Mail {
-  constructor(public to?: string, public subject?: string, public message?: string) {}
+import Constants from '../constants/Constants';
+import logger from '../log/logger';
+import AppError from '../errors/AppError';
+import IErrors from '../errors/IErrors';
+
+interface IEmail {
+  to: string;
+  subject: string;
+  message: string;
+}
+
+class MailService {
+  private to: string;
+
+  private subject: string;
+
+  private message: string;
+
+  constructor(to: string, subject: string, message: string) {
+    this.to = to;
+    this.subject = subject;
+    this.message = message;
+    this.configureMail();
+  }
 
   public async configureMail(): Promise<void> {
-    const nodeEnv = Constants.NODE_ENV || 'development';
-
-    const message = {
-      subject: `Database ${nodeEnv.toUpperCase()}`,
-      message:
-        `Database stop working on ${nodeEnv.toUpperCase()}<br>` +
-        `Please validate the last log on Task Service and restart the process <br>` +
-        `Thank you, <br>` +
-        `Squads Notifier`,
-      to: 'murillo_borgess@hotmail.com',
+    const message: IEmail = {
+      to: this.to,
+      subject: this.subject,
+      message: this.message,
     };
 
     this.to = message.to;
     this.subject = message.subject;
     this.message = message.message;
-    this.sendMail();
   }
 
   public sendMail(): void {
-    const mailOptions = {
-      from: Constants.MAIL_FROM,
-      to: this.to,
-      subject: this.subject,
-      html: this.message,
-    };
+    try {
+      const mailOptions = {
+        from: Constants.MAIL_FROM,
+        to: this.to,
+        subject: this.subject,
+        html: this.message,
+      };
 
-    const transporter = nodemailer.createTransport({
-      service: Constants.MAIL_SERVICE,
-      auth: { user: Constants.MAIL_USER, pass: Constants.MAIL_PASSWORD },
-    });
+      const transporter = nodemailer.createTransport({
+        service: Constants.MAIL_SERVICE,
+        auth: { user: Constants.MAIL_USER, pass: Constants.MAIL_PASSWORD },
+      });
 
-    transporter.sendMail(mailOptions);
+      transporter.sendMail(mailOptions);
+    } catch (error) {
+      logger.error('[MailService][sendMail] error', {
+        field: '[MailService][sendMail]',
+        message: this.message,
+        error,
+      });
+      throw new AppError(500, [IErrors.client.failedToSendEmail]);
+    }
   }
 }
 
-export default new Mail();
+export default MailService;

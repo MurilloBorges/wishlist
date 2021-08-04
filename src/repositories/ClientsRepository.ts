@@ -80,6 +80,24 @@ class ClientsRepository extends Schema<IClient> {
   }
 
   /**
+   * Método responsável por ativar a conta do cliente na base de dados,
+   * tendo como premissa o id do cliente
+   *
+   * @public
+   * @async
+   * @param {string} id
+   * @returns {Promise<IClient | null>} Promise<IClient | null>
+   */
+  public async updateEmailConfirmation(id: string): Promise<IClient | null> {
+    const result = await this.model.findOneAndUpdate(
+      { _id: id },
+      { emailConfirmation: true },
+      { new: true },
+    );
+    return result;
+  }
+
+  /**
    * Método responsável por excluir um cliente da base de dados,
    * tendo como premissa o id do cliente
    *

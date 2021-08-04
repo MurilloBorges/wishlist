@@ -5,6 +5,7 @@ import IErrors from '../errors/IErrors';
 
 import authConfig from '../config/auth';
 import logger from '../log/logger';
+import ClientService from '../services/ClientService';
 
 /**
  * Função responsável por gerar o token JWT
@@ -86,7 +87,11 @@ export function decodeToken(
  * @param {NextFunction} next
  * @returns {any} any
  */
-export default function ensureAuthenticated(req: Request, res: Response, next: NextFunction): any {
+export default async function ensureAuthenticated(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<any> {
   const { authorization } = req.headers;
 
   if (!authorization) {
@@ -131,7 +136,10 @@ export default function ensureAuthenticated(req: Request, res: Response, next: N
 
   const data = decodeToken(token, req.originalUrl === '/authenticate/refresh');
 
-  req.clientId = data.clientId;
+  if (data.clientId) {
+    req.clientId = data.clientId;
+    await ClientService.getInstance().show(data.clientId);
+  }
 
   logger.info('[ensureAuthenticated] jwt authentication', {
     field: '[ensureAuthenticated]',

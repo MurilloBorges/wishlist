@@ -30,6 +30,7 @@ const IErrors = {
     failedToIndex: { error: 'Falha ao buscar produtos', code: 300003 },
     faliedToShow: { error: 'Falha ao buscar produto.', code: 300004 },
     invalidPage: { error: 'Página inválida.', code: 300005 },
+    invalidId: { error: 'ID produto inválido', code: 300006 },
   },
   favoriteProduct: {
     exists: { error: 'Produto já adicionado a lista de favoritos.', code: 400001 },

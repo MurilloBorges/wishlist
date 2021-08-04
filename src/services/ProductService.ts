@@ -1,3 +1,4 @@
+import validator from 'validator';
 import HttpClientChallenge from '../config/HttpClientChallenge';
 import { IProductInterface } from '../@types/ProductTypes';
 import AppError from '../errors/AppError';
@@ -61,6 +62,10 @@ export default class ProductService extends HttpClientChallenge {
    * @returns {Promise<IProductInterface>} Promise<IProductInterface>
    */
   public async show(id: string): Promise<IProductInterface> {
+    if (!validator.isUUID(id)) {
+      throw new AppError(400, [IErrors.product.invalidId]);
+    }
+
     let res = null;
     try {
       res = await this.instance.get<IProductInterface>(`/product/${id}/`);

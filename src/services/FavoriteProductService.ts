@@ -4,12 +4,33 @@ import IErrors from '../errors/IErrors';
 import logger from '../log/logger';
 import { IFavoriteProduct } from '../models/FavoriteProducts';
 import FavoriteProductsRepository from '../repositories/FavoriteProductsRepository';
+import ProductService from './ProductService';
 
 class FavoriteProductService {
+  private static classInstance?: FavoriteProductService;
+
   private repository: FavoriteProductsRepository;
+
+  private productService: ProductService;
 
   constructor() {
     this.repository = new FavoriteProductsRepository();
+    this.productService = ProductService.getInstance();
+  }
+
+  /**
+   * Método responsável por criar uma nova instância da classe FavoriteProductService
+   *
+   * @public
+   * @static
+   * @returns {FavoriteProductService} FavoriteProductService
+   */
+  public static getInstance(): FavoriteProductService {
+    if (!this.classInstance) {
+      this.classInstance = new FavoriteProductService();
+    }
+
+    return this.classInstance;
   }
 
   /**
@@ -22,13 +43,16 @@ class FavoriteProductService {
    * @returns {Promise<IFavoriteProduct} Promise<IFavoriteProduct>
    */
   public async store(favoriteProduct: IFavoriteProduct): Promise<IFavoriteProduct> {
-    const favoritado = await this.index(favoriteProduct.client, {
+    const favoritado = await this.index({
+      client: favoriteProduct.client,
       productId: favoriteProduct.productId,
     });
 
     if (favoritado.length >= 1) {
       throw new AppError(400, [IErrors.favoriteProduct.exists]);
     }
+
+    await this.productService.show(favoriteProduct.productId);
 
     try {
       const result = await this.repository.store(favoriteProduct);
@@ -54,17 +78,14 @@ class FavoriteProductService {
    * @param {FilterQuery<IFavoriteProduct>} query
    * @returns {Promise<IFavoriteProduct[]} Promise<IFavoriteProduct[]>
    */
-  public async index(
-    clientId: string,
-    query?: FilterQuery<IFavoriteProduct>,
-  ): Promise<IFavoriteProduct[]> {
+  public async index(query?: FilterQuery<IFavoriteProduct>): Promise<IFavoriteProduct[]> {
     try {
-      const result = await this.repository.list(clientId, query);
+      const result = await this.repository.list(query);
       return result;
     } catch (error) {
       logger.error('[FavoriteProductService][index] error', {
         field: '[FavoriteProductService][index]',
-        client: JSON.stringify({ id: clientId }),
+        client: JSON.stringify({ id: query?.client }),
         favoriteProduct: JSON.stringify(query),
         error,
       });
@@ -83,13 +104,13 @@ class FavoriteProductService {
    * @returns {Promise<IFavoriteProduct | null>} Promise<IFavoriteProduct | null>
    */
   public async show(clientId: string, id: string): Promise<IFavoriteProduct | null> {
+    const result = await this.repository.show(clientId, id);
+
+    if (!result) {
+      throw new AppError(404, [IErrors.favoriteProduct.notFound]);
+    }
+
     try {
-      const result = await this.repository.show(clientId, id);
-
-      if (!result) {
-        throw new AppError(404, [IErrors.favoriteProduct.notFound]);
-      }
-
       return result;
     } catch (error) {
       logger.error('[FavoriteProductService][show] error', {
@@ -113,13 +134,13 @@ class FavoriteProductService {
    * @returns {Promise<IFavoriteProduct | null>} Promise<IFavoriteProduct | null>
    */
   public async showByProduct(clientId: string, id: string): Promise<IFavoriteProduct | null> {
+    const result = await this.repository.showByProduct(clientId, id);
+
+    if (!result) {
+      throw new AppError(404, [IErrors.favoriteProduct.notFound]);
+    }
+
     try {
-      const result = await this.repository.showByProduct(clientId, id);
-
-      if (!result) {
-        throw new AppError(404, [IErrors.favoriteProduct.notFound]);
-      }
-
       return result;
     } catch (error) {
       logger.error('[FavoriteProductService][showByProduct] error', {
@@ -143,11 +164,7 @@ class FavoriteProductService {
    * @returns {Promise<IFavoriteProduct | null>} Promise<IFavoriteProduct | null>
    */
   public async delete(clientId: string, id: string): Promise<IFavoriteProduct | null> {
-    const client = await this.show(clientId, id);
-
-    if (!client) {
-      throw new AppError(404, [IErrors.favoriteProduct.notFound]);
-    }
+    await this.show(clientId, id);
 
     try {
       const result = await this.repository.delete(clientId, id);
@@ -174,11 +191,7 @@ class FavoriteProductService {
    * @returns {Promise<IFavoriteProduct | null>} Promise<IFavoriteProduct | null>
    */
   public async deleteByProduct(clientId: string, id: string): Promise<IFavoriteProduct | null> {
-    const client = await this.showByProduct(clientId, id);
-
-    if (!client) {
-      throw new AppError(404, [IErrors.favoriteProduct.notFound]);
-    }
+    await this.showByProduct(clientId, id);
 
     try {
       const result = await this.repository.deleteByProduct(clientId, id);

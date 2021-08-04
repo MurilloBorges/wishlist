@@ -30,11 +30,8 @@ class FavoriteProductsRepository extends Schema<IFavoriteProduct> {
    * @param {FilterQuery<any>} query
    * @returns {Promise<IFavoriteProduct[]>} Promise<IFavoriteProduct[]>
    */
-  public async list(
-    clientId: string,
-    query?: FilterQuery<IFavoriteProduct>,
-  ): Promise<IFavoriteProduct[]> {
-    const result = await this.model.find({ ...query, client: clientId } || { client: clientId });
+  public async list(query?: FilterQuery<IFavoriteProduct>): Promise<IFavoriteProduct[]> {
+    const result = await this.model.find(query || {});
     return result;
   }
 

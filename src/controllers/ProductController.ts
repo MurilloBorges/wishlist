@@ -1,6 +1,6 @@
-import AppError from 'errors/AppError';
-import IErrors from 'errors/IErrors';
 import { Response, Request, NextFunction } from 'express';
+import AppError from '../errors/AppError';
+import IErrors from '../errors/IErrors';
 import logger from '../log/logger';
 import ProductService from '../services/ProductService';
 

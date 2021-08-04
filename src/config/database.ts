@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 import Constants from '../constants/Constants';
 import logger from '../log/logger';
-import Mail from '../services/mail.service';
 
 require('dotenv/config');
 
@@ -31,5 +30,4 @@ export default mongoose
       field: '[application]',
       err,
     });
-    // await Mail.configureMail();
   });

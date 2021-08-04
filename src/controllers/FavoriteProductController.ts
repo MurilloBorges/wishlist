@@ -133,7 +133,7 @@ class FavoriteProductController {
 
   /**
    * Método responsável por excluir um produto da lista de favoritos,
-   * tem como premissa o id do favorito
+   * tem como premissa o id do produto
    *
    * @public
    * @async

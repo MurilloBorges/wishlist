@@ -1,10 +1,11 @@
 import mongoose from 'mongoose';
+import Constants from '../constants/Constants';
 import logger from '../log/logger';
 import Mail from '../services/mail.service';
 
 require('dotenv/config');
 
-const url = `mongodb+srv://${process.env.DATABASE_HOST}`;
+const url = `mongodb+srv://${Constants.DATABASE_HOST}`;
 
 const options = {
   useUnifiedTopology: true,

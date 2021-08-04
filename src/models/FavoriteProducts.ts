@@ -2,10 +2,11 @@ import { Schema, model, Document, Model, Types } from 'mongoose';
 
 export interface IFavoriteProduct extends Document {
   id?: string;
-  client: string;
-  productId: string;
+  client?: string;
+  productId?: string;
   createdAt?: Date;
   updatedAt?: Date;
+  preview?: string;
 }
 
 const FavoriteProductSchema = new Schema(

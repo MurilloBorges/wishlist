@@ -1,18 +1,19 @@
 /* eslint-disable no-console */
 import winston, { format } from 'winston';
-
 import Elasticsearch, { LogData } from 'winston-elasticsearch';
+
+import Constants from '../constants/Constants';
 
 const { combine, timestamp, prettyPrint, errors, splat } = format;
 
 const esTransportOpts = {
-  index: process.env.LOG_INDEX,
+  index: Constants.LOG_INDEX,
   level: 'info',
   clientOpts: {
     // https://cloud.elastic.co/login?redirectTo=%2Fdeployments%2Fe17c521ed00540808e29465d9289966d
     host: 'https://logs-wishlist-api.es.eastus2.azure.elastic-cloud.com:9243',
     log: 'info',
-    httpAuth: `${process.env.LOG_PASSWORD}`,
+    httpAuth: `${Constants.LOG_PASSWORD}`,
   },
   transformer: (log: LogData) => {
     console.log(log.message);
@@ -39,7 +40,7 @@ const logger = winston.createLogger({
   ],
 });
 
-if (process.env.NODE_ENV !== 'production') {
+if (Constants.NODE_ENV !== 'production') {
   logger.add(
     new winston.transports.Console({
       format: winston.format.simple(),

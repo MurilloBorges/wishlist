@@ -1,8 +1,8 @@
-import 'dotenv/config';
+import Constants from '../constants/Constants';
 
 export default {
   jwt: {
-    secret: process.env.APP_SECRET,
+    secret: Constants.APP_SECRET,
     expiresIn: '1d',
   },
 };

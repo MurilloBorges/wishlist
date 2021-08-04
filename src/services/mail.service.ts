@@ -1,11 +1,11 @@
 import * as nodemailer from 'nodemailer';
-import 'dotenv/config';
+import Constants from '../constants/Constants';
 
 class Mail {
   constructor(public to?: string, public subject?: string, public message?: string) {}
 
   public async configureMail(): Promise<void> {
-    const nodeEnv = process.env.NODE_ENV || 'development';
+    const nodeEnv = Constants.NODE_ENV || 'development';
 
     const message = {
       subject: `Database ${nodeEnv.toUpperCase()}`,
@@ -25,15 +25,15 @@ class Mail {
 
   public sendMail(): void {
     const mailOptions = {
-      from: process.env.MAIL,
+      from: Constants.MAIL_FROM,
       to: this.to,
       subject: this.subject,
       html: this.message,
     };
 
     const transporter = nodemailer.createTransport({
-      service: process.env.MAIL_SERVICE,
-      auth: { user: process.env.MAIL_USER, pass: process.env.MAIL_PASSWORD },
+      service: Constants.MAIL_SERVICE,
+      auth: { user: Constants.MAIL_USER, pass: Constants.MAIL_PASSWORD },
     });
 
     transporter.sendMail(mailOptions);

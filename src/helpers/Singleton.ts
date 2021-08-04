@@ -1,36 +1,28 @@
-/* eslint-disable no-useless-constructor */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable @typescript-eslint/no-empty-function */
 export interface IUserToken {
   token: string;
-  user: string;
-  date?: Date;
-  message?: string;
+  clientId: string;
 }
 
 class Singleton {
   private static instance: Singleton;
 
-  private token: IUserToken[];
+  private user: IUserToken | undefined;
 
-  private constructor() {
-    this.token = [];
-  }
+  private constructor() {}
 
   public static get Instance() {
     const inst = this.instance || (this.instance = new this());
     return inst;
   }
 
-  public setToken(token: IUserToken) {
-    let userToken = this.token.filter(data => data.user !== token.user);
-    if (!userToken) {
-      userToken = [];
-    }
-    userToken.push(token);
-    this.token = userToken;
+  public setUser(user: IUserToken) {
+    this.user = user;
   }
 
-  public getTokens(): IUserToken[] {
-    return this.token;
+  public getUser(): IUserToken | undefined {
+    return this.user;
   }
 }
 

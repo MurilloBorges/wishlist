@@ -1,3 +1,4 @@
+import Constants from 'constants/Constants';
 import { FilterQuery } from 'mongoose';
 import AppError from '../errors/AppError';
 import IErrors from '../errors/IErrors';
@@ -52,11 +53,19 @@ class FavoriteProductService {
       throw new AppError(400, [IErrors.favoriteProduct.exists]);
     }
 
-    await this.productService.show(favoriteProduct.productId);
+    await this.productService.show(favoriteProduct.productId as string);
 
     try {
       const result = await this.repository.store(favoriteProduct);
-      return result;
+
+      return {
+        _id: result.id,
+        preview: `${Constants.HOST}/products/${result.productId}`,
+        client: result.client,
+        productId: result.productId,
+        createdAt: result.createdAt,
+        updatedAt: result.updatedAt,
+      } as IFavoriteProduct;
     } catch (error) {
       logger.error('[FavoriteProductService][store] error', {
         field: '[FavoriteProductService][store]',
@@ -80,7 +89,15 @@ class FavoriteProductService {
    */
   public async index(query?: FilterQuery<IFavoriteProduct>): Promise<IFavoriteProduct[]> {
     try {
-      const result = await this.repository.list(query);
+      let result = await this.repository.list(query);
+      if (result.length >= 1) {
+        result = result.map(data => ({
+          _id: data.id,
+          preview: `${Constants.HOST}/products/${data.productId}`,
+          createdAt: data.createdAt,
+        })) as IFavoriteProduct[];
+      }
+
       return result;
     } catch (error) {
       logger.error('[FavoriteProductService][index] error', {
@@ -111,7 +128,14 @@ class FavoriteProductService {
     }
 
     try {
-      return result;
+      return {
+        _id: result.id,
+        preview: `${Constants.HOST}/products/${result.productId}`,
+        client: result.client,
+        productId: result.productId,
+        createdAt: result.createdAt,
+        updatedAt: result.updatedAt,
+      } as IFavoriteProduct;
     } catch (error) {
       logger.error('[FavoriteProductService][show] error', {
         field: '[FavoriteProductService][show]',
@@ -141,7 +165,14 @@ class FavoriteProductService {
     }
 
     try {
-      return result;
+      return {
+        _id: result.id,
+        preview: `${Constants.HOST}/products/${result.productId}`,
+        client: result.client,
+        productId: result.productId,
+        createdAt: result.createdAt,
+        updatedAt: result.updatedAt,
+      } as IFavoriteProduct;
     } catch (error) {
       logger.error('[FavoriteProductService][showByProduct] error', {
         field: '[FavoriteProductService][showByProduct]',

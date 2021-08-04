@@ -3,11 +3,12 @@ import * as Yup from 'yup';
 import { Request, Response } from 'express';
 import AppError from '../errors/AppError';
 import IErrors from '../errors/IErrors';
-import ClientService from '../services/ClientService';
+import ClientService, { subject, emailConfirmationMessage } from '../services/ClientService';
 
 import authConfig from '../config/auth';
 import { generateToken } from '../middlewares/auth';
 import logger from '../log/logger';
+import MailService from '../services/mail.service';
 
 class AuthenticationController {
   private clientService: ClientService;
@@ -44,6 +45,17 @@ class AuthenticationController {
 
     if (!client || client.length === 0) {
       throw new AppError(404, [IErrors.client.notFound]);
+    }
+
+    if (!client[0].emailConfirmation) {
+      const mail = new MailService(
+        client[0].email,
+        subject,
+        emailConfirmationMessage(client[0].name, client[0].id as string),
+      );
+      mail.sendMail();
+
+      throw new AppError(400, [IErrors.client.notEmailConfirmation]);
     }
 
     try {

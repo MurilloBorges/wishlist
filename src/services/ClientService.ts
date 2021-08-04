@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { FilterQuery } from 'mongoose';
 import logger from '../log/logger';
 import { IClient } from '../models/Clients';
@@ -5,6 +6,10 @@ import AppError from '../errors/AppError';
 import IErrors from '../errors/IErrors';
 import ClientsRepository from '../repositories/ClientsRepository';
 import MailService from './mail.service';
+
+export const subject = 'Ativação de conta - Wishlist';
+export const emailConfirmationMessage = (name: string, id: string) =>
+  `<b style="">Oi ${name}</b> </br></br> Sua conta na Wishlist está quase pronta. Para ativá-la, por favor confirme o seu endereço de e-mail clicando no link abaixo. </br></br> <span><b><a href="http://localhost:3333/clients/${id}/email/confirmation" target="_blank" rel="noopener noreferrer" data-auth="NotApplicable" title="http://localhost:3333/clients/:id/email/confirmation/:confirmation" data-linkindex="0" data-ogsc="" style="color: rgb(228, 159, 255);">Ativar minha conta/Confirmar meu e-mail</a><br></b></span> </br></br> <b style="">Sua conta não será ativada até que seu e-mail seja confirmado.</b> </br></br> <b>Se você não se cadastrou na wishlist recentemente, por favor ignore este email.</b> </br></br> Agradecemos desde já, </br></br> Atenciosamente, Wishlist!`;
 
 class ClientService {
   private static classInstance?: ClientService;
@@ -57,9 +62,11 @@ class ClientService {
       throw new AppError(500, [IErrors.client.failedToStore]);
     }
 
-    const subject = 'Ativação de conta - Wishlist';
-    const message = `<b style="">Oi ${result.name}</b> </br></br> Sua conta na Wishlist está quase pronta. Para ativá-la, por favor confirme o seu endereço de e-mail clicando no link abaixo. </br></br> <span><b><a href="http://localhost:3333/clients/${result.id}/email/confirmation" target="_blank" rel="noopener noreferrer" data-auth="NotApplicable" title="http://localhost:3333/clients/:id/email/confirmation/:confirmation" data-linkindex="0" data-ogsc="" style="color: rgb(228, 159, 255);">Ativar minha conta/Confirmar meu e-mail</a><br></b></span> </br></br> <b style="">Sua conta não será ativada até que seu e-mail seja confirmado.</b> </br></br> <b>Se você não se cadastrou na wishlist recentemente, por favor ignore este email.</b> </br></br> Agradecemos desde já, </br></br> Atenciosamente, Wishlist!`;
-    const mail = new MailService(result.email, subject, message);
+    const mail = new MailService(
+      result.email,
+      subject,
+      emailConfirmationMessage(result.name, result.id as string),
+    );
     mail.sendMail();
 
     return result;
@@ -76,9 +83,9 @@ class ClientService {
    * @returns {Promise<IClient[]>} Promise<IClient[]>
    */
   public async index(query?: FilterQuery<IClient>): Promise<IClient[]> {
-    let result = null;
     try {
-      result = await this.repository.list(query);
+      const result = await this.repository.list(query);
+      return result;
     } catch (error) {
       logger.error('[ClientService][index] error', {
         field: '[ClientService][index]',
@@ -87,10 +94,6 @@ class ClientService {
       });
       throw new AppError(500, [IErrors.client.failedToIndex]);
     }
-
-    const clients = result.filter(data => data.emailConfirmation);
-
-    return clients;
   }
 
   /**
